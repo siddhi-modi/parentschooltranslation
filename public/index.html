@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Module Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="w-full min-h-screen bg-white p-4 md:p-6">
+
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h1 class="text-xl font-bold text-blue-900">Translation Module Demo</h1>
+            <div class="flex items-center gap-2">
+                <label for="langSelect" class="font-semibold text-sm">Translate to:</label>
+                <select id="langSelect" class="border p-2 rounded bg-white">
+                    <option value="gu">Gujarati</option>
+                    <option value="hi">Hindi</option>
+                    <option value="en">English</option>
+                    <option value="mr">Marathi</option>
+                    <option value="ta">Tamil</option>
+                    <option value="bn">Bengali</option>
+                </select>
+                <button id="translateBtn" class="bg-blue-600 text-white px-6 py-2 rounded font-medium hover:bg-blue-700 disabled:opacity-60">
+                    Translate
+                </button>
+            </div>
+        </div>
+
+        <label for="inputText" class="block font-semibold mb-1 text-sm">Original Text:</label>
+        <textarea id="inputText" class="w-full h-[34vh] border p-3 rounded text-lg mb-4" placeholder="Enter school notice here..."></textarea>
+
+        <label class="block font-semibold mb-1 text-sm">Translated Text:</label>
+        <div id="outputBox" class="w-full h-[34vh] border p-3 rounded bg-gray-50 overflow-y-auto text-gray-800 text-lg whitespace-pre-wrap">Output will appear here...</div>
+
+    </div>
+
+    <script>
+        const translateBtn = document.getElementById('translateBtn');
+
+        translateBtn.addEventListener('click', async () => {
+            const text = document.getElementById('inputText').value;
+            const targetLanguage = document.getElementById('langSelect').value;
+            const outputBox = document.getElementById('outputBox');
+
+            if (!text.trim()) {
+                outputBox.innerText = "Please enter a notice to translate.";
+                return;
+            }
+
+            outputBox.innerText = "Processing translation...";
+            translateBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, targetLanguage })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    outputBox.innerText = data.translation;
+                } else {
+                    outputBox.innerText = "Error: " + data.error;
+                }
+            } catch (err) {
+                outputBox.innerText = "Network Error: Could not connect to backend.";
+            } finally {
+                translateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
