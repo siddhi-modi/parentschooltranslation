@@ -26,12 +26,16 @@ app.post('/api/translate', async (req, res) => {
     }
 });
 
-console.log(`--> Attempting to start server listening on port ${PORT}...`);
+// Only start our own server on a local computer. Vercel runs the app itself.
+if (!process.env.VERCEL) {
+    console.log(`--> Attempting to start server listening on port ${PORT}...`);
 
-app.listen(PORT, () => {
-    console.log(`\n✔ SUCCESS: Server is up and listening!`);
-    console.log(`👉 Open your browser to: http://localhost:${PORT}\n`);
-}).on('error', (err) => {
-    console.error("❌ SERVER CRASHED ON START:", err.message);
-});
+    app.listen(PORT, () => {
+        console.log(`\n✔ SUCCESS: Server is up and listening!`);
+        console.log(`👉 Open your browser to: http://localhost:${PORT}\n`);
+    }).on('error', (err) => {
+        console.error("❌ SERVER CRASHED ON START:", err.message);
+    });
+}
 
+export default app;
